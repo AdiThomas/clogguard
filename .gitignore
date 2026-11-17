@@ -1,0 +1,28 @@
+# data and experiment output are never committed
+data/
+runs/
+mlruns/
+*.parquet
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# notebooks
+.ipynb_checkpoints/
+
+# secrets and local config
+.env
+*.local.toml
+
+# os and editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
