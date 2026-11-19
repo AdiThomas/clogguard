@@ -50,7 +50,8 @@ class CommandResult(_Event):
     type: Literal["command_result"] = "command_result"
     command: Command
     accepted: bool
-    rejected_reason: str | None = None
+    rejected_reason: str | None = None  # set only when accepted=False
+    error: str | None = None  # delivery problem after acceptance (e.g. not acked)
     rpc_method: str | None = None
     sent_at_s: float | None = None
     acked_at_s: float | None = None

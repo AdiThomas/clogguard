@@ -59,7 +59,7 @@ async def test_watch_mode_delivers_notify() -> None:
 
 # -- accepted commands use the exact templates ---------------------------------------------
 async def test_speed_temp_purge_pause_templates() -> None:
-    g, link, _ = gate_for(make_cfg(purge_enabled=True, purge_macro="MY_PURGE"))
+    g, link, _ = gate_for(make_cfg(purge_enabled=True, purge_macro="CLOGGUARD_MY_PURGE"))
     r1 = await submit(g, SetSpeedFactor(percent=85), now=100)
     r2 = await submit(g, SetNozzleTemp(target_c=215.0), now=110)
     r3 = await submit(g, RunPurge(), now=120)
@@ -68,7 +68,7 @@ async def test_speed_temp_purge_pause_templates() -> None:
     assert link.calls == [
         (GCODE_METHOD, {"script": "M220 S85"}),
         (GCODE_METHOD, {"script": "SET_HEATER_TEMPERATURE HEATER=extruder TARGET=215.0"}),
-        (GCODE_METHOD, {"script": "MY_PURGE"}),
+        (GCODE_METHOD, {"script": "CLOGGUARD_MY_PURGE"}),
         (PAUSE_METHOD, {}),
     ]
     assert r1.sent_at_s == 100 and r1.acked_at_s == 100 and r1.decision_t_s == 100
@@ -185,7 +185,7 @@ async def test_missing_ack_is_sent_but_not_applied() -> None:
     g, link, _ = gate_for(make_cfg(ack_timeout=0.02), hang=True)
     r = await submit(g, SetSpeedFactor(percent=85), now=100)
     assert r.accepted and r.acked_at_s is None and r.sent_at_s == 100
-    assert r.rejected_reason is not None and r.rejected_reason.startswith(NOT_ACKED)
+    assert r.error is not None and r.error.startswith(NOT_ACKED) and r.rejected_reason is None
     assert not was_applied(r) and len(link.calls) == 1
     # counted as sent for the interval rule (conservative)
     assert code(await submit(g, SetSpeedFactor(percent=70), now=101)) == gate_mod.REJECT_INTERVAL
@@ -195,7 +195,7 @@ async def test_transport_error_is_noted() -> None:
     g, _, _ = gate_for(fail_with=ConnectionError("boom"))
     r = await submit(g, Pause(reason="p"))
     assert r.accepted and r.acked_at_s is None and "ConnectionError: boom" in (
-        r.rejected_reason or "")
+        r.error or "")
 
 
 async def test_ack_time_uses_gate_clock() -> None:
@@ -215,10 +215,10 @@ async def test_notifier_failure_and_timeout() -> None:
     cfg = make_cfg(ack_timeout=0.02)
     g = SafetyGate(cfg, InMemoryLink(), RecordingNotifier(fail_with=RuntimeError("x")))
     r = await submit(g, Notify(level="info", message="m"))
-    assert r.accepted and r.acked_at_s is None and "RuntimeError" in (r.rejected_reason or "")
+    assert r.accepted and r.acked_at_s is None and "RuntimeError" in (r.error or "")
     g2 = SafetyGate(cfg, InMemoryLink(), RecordingNotifier(hang=True))
     r2 = await submit(g2, Notify(level="info", message="m"))
-    assert r2.acked_at_s is None and "timed out" in (r2.rejected_reason or "")
+    assert r2.acked_at_s is None and "timed out" in (r2.error or "")
 
 
 # -- untrusted objects -----------------------------------------------------------------------

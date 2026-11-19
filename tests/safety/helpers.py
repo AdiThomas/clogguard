@@ -5,6 +5,14 @@ from typing import Any
 from clogguard.core.config import LadderConfig, MaterialProfile, ServiceConfig
 
 
+def _ladder(lad: dict[str, Any]) -> LadderConfig:
+    """Build a LadderConfig. A purge_macro that config validation would refuse (e.g. "M112") is
+    injected without validation, to test that the gate still refuses it on its own."""
+    macro = lad.pop("purge_macro", None)
+    cfg = LadderConfig(**lad)
+    return cfg if macro is None else cfg.model_copy(update={"purge_macro": macro})
+
+
 def make_cfg(
     mode: str = "act",
     *,
@@ -18,7 +26,7 @@ def make_cfg(
     return ServiceConfig(
         mode=mode,  # type: ignore[arg-type]
         material=MaterialProfile(nominal_temp_c=nominal, max_temp_c=max_temp),
-        ladder=LadderConfig(**lad),
+        ladder=_ladder(lad),
         command_ack_timeout_s=ack_timeout,
     )
 

@@ -42,7 +42,9 @@ class LadderConfig(_Cfg):
     temp_step_c: float = Field(default=5.0, gt=0, le=15)
     max_temp_raise_c: float = Field(default=15.0, ge=0, le=40)
     purge_enabled: bool = False
-    purge_macro: str = Field(default="CLOGGUARD_PURGE", pattern=r"^[A-Z][A-Z0-9_]{0,40}$")
+    # Must be a macro the team installed for ClogGuard, so it can never name a raw G-code word
+    # (M112, G28) or a built-in Klipper command.
+    purge_macro: str = Field(default="CLOGGUARD_PURGE", pattern=r"^CLOGGUARD_[A-Z0-9_]{1,40}$")
     verify_window_s: float = Field(default=60.0, gt=0)
     min_action_interval_s: float = Field(default=60.0, gt=0)
     max_interventions_per_print: int = Field(default=6, ge=1, le=50)

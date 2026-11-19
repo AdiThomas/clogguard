@@ -18,8 +18,8 @@ def A(t: float, p: float | None, **kw: Any) -> Assessment:
 def result(cmd: Command, t: float, *, accepted: bool = True, acked: bool = True) -> CommandResult:
     return CommandResult(
         t_s=t, wall_time=WALL, command=cmd, accepted=accepted,
-        rejected_reason=None if accepted and acked else ("min_interval: x" if not accepted
-                                                          else "not_acked: timeout"),
+        rejected_reason=None if accepted else "min_interval: x",
+        error="not_acked: timeout" if accepted and not acked else None,
         sent_at_s=t if accepted else None, acked_at_s=t + 0.1 if accepted and acked else None,
         decision_t_s=t,
     )

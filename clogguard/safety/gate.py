@@ -9,8 +9,8 @@ Outcome semantics (``CommandResult``):
   a stable code (``REJECT_*`` below) followed by ``": "`` and detail.
 * ``accepted=True, acked_at_s`` set - sent and acknowledged by the printer (or notifier).
 * ``accepted=True, acked_at_s=None`` - sent but not acknowledged: the transport raised or no
-  ack arrived within ``command_ack_timeout_s``. ``rejected_reason`` then holds a delivery note
-  starting with ``NOT_ACKED`` (the core ``CommandResult`` has no separate error field). The
+  ack arrived within ``command_ack_timeout_s``. ``error`` then holds a delivery note
+  starting with ``NOT_ACKED``. The
   command may or may not have been applied; callers must treat it as **not applied** for
   recovery purposes (``was_applied`` is False) while the gate counts it, conservatively, as
   sent for the min-interval and intervention-cap limits.
@@ -227,7 +227,7 @@ class SafetyGate:
             note = f"{NOT_ACKED}: {type(exc).__name__}: {exc}"[:300]
         acked = None if note else now_s + (self._clock() - start)
         return result(
-            cmd, accepted=True, rejected_reason=note, rpc_method=rpc.method, sent_at_s=now_s,
+            cmd, accepted=True, error=note, rpc_method=rpc.method, sent_at_s=now_s,
             acked_at_s=acked,
         )
 
@@ -246,6 +246,6 @@ class SafetyGate:
             note = f"{NOT_ACKED}: notifier {type(exc).__name__}: {exc}"[:300]
         acked = None if note else now_s + (self._clock() - start)
         return result(
-            cmd, accepted=True, rejected_reason=note, rpc_method=NOTIFIER_TARGET, sent_at_s=now_s,
+            cmd, accepted=True, error=note, rpc_method=NOTIFIER_TARGET, sent_at_s=now_s,
             acked_at_s=acked,
         )

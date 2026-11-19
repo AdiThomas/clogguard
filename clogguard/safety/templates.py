@@ -17,7 +17,7 @@ PAUSE_METHOD = "printer.print.pause"
 
 SPEED_RE = re.compile(r"M220 S(100|[1-9][0-9]?)")
 TEMP_RE = re.compile(r"SET_HEATER_TEMPERATURE HEATER=extruder TARGET=([0-9]{1,3}\.[0-9])")
-MACRO_RE = re.compile(r"[A-Z][A-Z0-9_]{0,40}")  # same pattern as LadderConfig.purge_macro
+MACRO_RE = re.compile(r"CLOGGUARD_[A-Z0-9_]{1,40}")  # same pattern as LadderConfig.purge_macro
 # A letter followed only by digits is a raw G-code (G28, M84, M112 ...), not a macro name.
 # LadderConfig's pattern allows those, so the gate refuses them as purge macros.
 RAW_GCODE_RE = re.compile(r"[A-Z][0-9]+")

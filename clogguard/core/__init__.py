@@ -9,8 +9,15 @@ from clogguard.core.commands import (
     SetNozzleTemp,
     SetSpeedFactor,
 )
-from clogguard.core.config import LadderConfig, MaterialProfile, ServiceConfig
-from clogguard.core.events import Assessment, AuditRecord, CommandResult, Decision, Recovery
+from clogguard.core.config import DetectorConfig, LadderConfig, MaterialProfile, ServiceConfig
+from clogguard.core.events import (
+    Assessment,
+    AuditRecord,
+    CommandResult,
+    Decision,
+    Lifecycle,
+    Recovery,
+)
 from clogguard.core.schema import (
     BASE_RATE_HZ,
     CONTEXT_CHANNELS,
@@ -33,8 +40,10 @@ __all__ = [
     "DataSource",
     "Decision",
     "DefectRating",
+    "DetectorConfig",
     "InductionSpec",
     "LadderConfig",
+    "Lifecycle",
     "MaterialProfile",
     "Notify",
     "Pause",

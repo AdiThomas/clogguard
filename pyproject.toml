@@ -49,6 +49,9 @@ clogguard = "clogguard.cli:main"
 [tool.setuptools.packages.find]
 include = ["clogguard*"]
 
+[tool.setuptools.package-data]
+"clogguard.sim" = ["*.yaml"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
