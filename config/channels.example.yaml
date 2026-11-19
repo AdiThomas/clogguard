@@ -1,0 +1,40 @@
+# Channel set for the January signal bake-off: every zero-cost Klipper signal plus the
+# candidate add-on sensors. Remove what is not fitted. Units are part of each name.
+version: 1
+channels:
+  # --- context: always recorded, explains normal variation ---------------------------------
+  - {name: extruder_temp_c, unit: degC, rate_hz: 4, source: moonraker, role: context,
+     params: {object: extruder, field: temperature}}
+  - {name: extruder_target_c, unit: degC, rate_hz: 4, source: moonraker, role: context,
+     params: {object: extruder, field: target}}
+  - {name: e_velocity_mm_s, unit: mm/s, rate_hz: 10, source: moonraker, role: context,
+     params: {object: motion_report, field: live_extruder_velocity}}
+  - {name: toolhead_velocity_mm_s, unit: mm/s, rate_hz: 10, source: moonraker, role: context,
+     params: {object: motion_report, field: live_velocity}}
+  - {name: speed_factor, unit: ratio, rate_hz: 1, source: moonraker, role: context,
+     params: {object: gcode_move, field: speed_factor}}
+  - {name: extrude_factor, unit: ratio, rate_hz: 1, source: moonraker, role: context,
+     params: {object: gcode_move, field: extrude_factor}}
+  - {name: fan_speed, unit: ratio, rate_hz: 1, source: moonraker, role: context,
+     params: {object: fan, field: speed}}
+  - {name: z_mm, unit: mm, rate_hz: 1, source: moonraker, role: context,
+     params: {object: toolhead, field: position, index: 2}}
+  - {name: volumetric_flow_mm3_s, unit: mm3/s, rate_hz: 10, source: derived, role: context,
+     params: {fn: volumetric_flow, inputs: [e_velocity_mm_s]}}
+
+  # --- candidate signals -------------------------------------------------------------------
+  - {name: extruder_power, unit: ratio, rate_hz: 4, source: moonraker, role: signal,
+     params: {object: extruder, field: power},
+     description: "Hotend heater duty. Zero added hardware."}
+  - {name: tmc_sg_result, unit: counts, rate_hz: 1, source: moonraker, role: signal,
+     params: {object: "tmc2209 extruder", field: drv_status, key: sg_result},
+     description: "StallGuard load. Read rate unverified; may be too slow or absent."}
+  - {name: force_g, unit: g, rate_hz: 10, source: serial, role: signal,
+     params: {port: /dev/ttyACM0, baud: 250000, key: force_g},
+     description: "Load cell between extruder and hotend via external MCU."}
+  - {name: accel_rms, unit: m/s2, rate_hz: 10, source: serial, role: signal,
+     params: {port: /dev/ttyACM1, baud: 250000, key: accel_rms, raw_rate_hz: 3200},
+     description: "Hotend ADXL345 RMS per base tick; raw samples kept in raw/accel.parquet."}
+  - {name: encoder_slip_mm, unit: mm, rate_hz: 10, source: serial, role: signal,
+     params: {port: /dev/ttyACM0, baud: 250000, key: encoder_slip_mm},
+     description: "Commanded minus measured filament advance per tick."}

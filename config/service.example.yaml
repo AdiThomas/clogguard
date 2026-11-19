@@ -1,0 +1,35 @@
+# ClogGuard service configuration. Copy to config/service.yaml and edit.
+moonraker_url: ws://127.0.0.1:7125/websocket
+api_key_env: MOONRAKER_API_KEY   # name of the environment variable holding the key
+mode: watch                      # watch: assess and alert only. act: may run the recovery ladder.
+
+material:
+  name: PLA
+  nominal_temp_c: 210
+  max_temp_c: 220                # ASSUMPTION: replace with the spool's datasheet maximum
+  filament_diameter_mm: 1.75
+  datasheet: ""
+
+ladder:                          # placeholders until recovery-tuning runs set them
+  speed_steps_percent: [85, 70, 55]
+  temp_step_c: 5
+  max_temp_raise_c: 10
+  purge_enabled: false
+  purge_macro: CLOGGUARD_PURGE
+  verify_window_s: 60
+  min_action_interval_s: 60
+  max_interventions_per_print: 6
+  pause_if_unrecoverable: true
+
+detector:
+  model_path: models/current.joblib
+  assess_interval_s: 1.0
+  stale_after_s: 3.0
+  watch_threshold: 0.4
+  warn_threshold: 0.6
+  act_threshold: 0.8
+  warmup_s: 120
+
+channels_file: config/channels.yaml
+runs_dir: runs
+command_ack_timeout_s: 2.0

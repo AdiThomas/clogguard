@@ -1,0 +1,32 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      - run: pytest -q --cov=clogguard --cov-report=term-missing --cov-fail-under=80
+
+  pi-install:
+    # The runtime dependency set must install on Raspberry Pi OS (arm64) without compilers.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - run: |
+          docker run --rm --platform linux/arm64 -v "$PWD":/src -w /src python:3.11-slim-bookworm \
+            sh -c 'pip install --only-binary=:all: . && python -c "import clogguard.core, clogguard.safety, clogguard.service"'
