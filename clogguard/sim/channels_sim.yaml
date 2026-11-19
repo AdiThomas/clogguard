@@ -1,0 +1,43 @@
+# Channel set produced by the clog SIMULATOR (clogguard.sim). All values are simulated.
+# Label channels are ground truth for evaluation only and must never be model inputs.
+version: 1
+channels:
+  # --- context -----------------------------------------------------------------------------
+  - {name: extruder_temp_c, unit: degC, rate_hz: 10, source: sim, role: context,
+     params: {key: extruder_temp_c}, description: "Smoothed hotend temperature (sim)."}
+  - {name: extruder_target_c, unit: degC, rate_hz: 10, source: sim, role: context,
+     params: {key: extruder_target_c}}
+  - {name: e_velocity_mm_s, unit: mm/s, rate_hz: 10, source: sim, role: context,
+     params: {key: e_velocity_mm_s},
+     description: "Commanded filament velocity (tick mean), as motion_report shows; not delivered."}
+  - {name: volumetric_flow_mm3_s, unit: mm3/s, rate_hz: 10, source: sim, role: context,
+     params: {key: volumetric_flow_mm3_s}, description: "Commanded volumetric flow."}
+  - {name: toolhead_velocity_mm_s, unit: mm/s, rate_hz: 10, source: sim, role: context,
+     params: {key: toolhead_velocity_mm_s}}
+  - {name: speed_factor, unit: ratio, rate_hz: 10, source: sim, role: context,
+     params: {key: speed_factor}}
+  - {name: extrude_factor, unit: ratio, rate_hz: 10, source: sim, role: context,
+     params: {key: extrude_factor}}
+  - {name: fan_speed, unit: ratio, rate_hz: 10, source: sim, role: context,
+     params: {key: fan_speed}}
+  - {name: z_mm, unit: mm, rate_hz: 10, source: sim, role: context, params: {key: z_mm}}
+  - {name: layer, unit: count, rate_hz: 10, source: sim, role: context, params: {key: layer}}
+  # --- candidate signals -------------------------------------------------------------------
+  - {name: extruder_power, unit: ratio, rate_hz: 10, source: sim, role: signal,
+     params: {key: extruder_power}, description: "Heater duty from thermal model + PID (sim)."}
+  - {name: force_g, unit: g, rate_hz: 10, source: sim, role: signal,
+     params: {key: force_g}, description: "Extrusion force: pressure x area + friction + noise."}
+  - {name: tmc_sg_result, unit: counts, rate_hz: 1, source: sim, role: signal,
+     params: {key: tmc_sg_result}, description: "StallGuard, quantised, held 1 s (sim)."}
+  - {name: accel_rms, unit: m/s2, rate_hz: 10, source: sim, role: signal,
+     params: {key: accel_rms}, description: "Hotend vibration RMS per tick (sim)."}
+  - {name: encoder_slip_mm, unit: mm, rate_hz: 10, source: sim, role: signal,
+     params: {key: encoder_slip_mm},
+     description: "Commanded minus delivered filament advance per tick (sim)."}
+  # --- labels (evaluation only) ------------------------------------------------------------
+  - {name: true_restriction, unit: ratio, rate_hz: 10, source: sim, role: label,
+     params: {key: true_restriction}, description: "1 - d_eff/d0."}
+  - {name: true_deficit, unit: ratio, rate_hz: 10, source: sim, role: label,
+     params: {key: true_deficit}, description: "1 - delivered/commanded flow (0 when not extruding)."}
+  - {name: true_defect, unit: bool, rate_hz: 10, source: sim, role: label,
+     params: {key: true_defect}, description: "Latched 1 once the deficit stayed above threshold."}
